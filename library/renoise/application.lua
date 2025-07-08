@@ -24,22 +24,42 @@ renoise.Application = {}
 ---
 ---**READ-ONLY** Get the apps main document, the song.
 ---The global "renoise.song()" function is, in fact, a shortcut to this property.
----@field current_song renoise.Song
+---@field current_song renoise.Song?
 ---
 ---**READ-ONLY** List of recently loaded song files.
 ---@field recently_loaded_song_files string[]
----
 ---**READ-ONLY** List of recently saved song files.
 ---@field recently_saved_song_files string[]
 ---
 ---**READ-ONLY** Returns information about all currently installed tools.
 ---@field installed_tools table<string, string>
+---Fired when the list of installed tools changed.
+---@field installed_tools_observable renoise.Document.Observable
 ---
----**READ-ONLY** Access keyboard modifier states.
+---Fired when the list of available audio plugin effects changed, for example
+---when scanning for new plugins in the preferences.
+---Use the component's `available_plugins` or `available_devices` properties
+---to access currently available devices which are supported by the component
+---such as the track device chains.
+---@field audio_plugin_effects_observable renoise.Document.Observable
+---Fired when the list of available audio plugin instruments changed, for example
+---when scanning for new plugins in the preferences.
+---@field audio_plugin_instruments_observable renoise.Document.Observable
+---
+---**Deprecated.** **READ-ONLY** Use `key_modifier_flags` instead
+---@deprecated
 ---@field key_modifier_states table<string, string>
+---**READ-ONLY** Access keyboard modifier states.
+---@field key_modifier_flags ModifierFlags
 ---
 ---**READ-ONLY** Access to the application's window.
 ---@field window renoise.ApplicationWindow
+---
+---**READ-ONLY** Access to the application's color theme.
+---@field theme renoise.ApplicationTheme
+---Fired, when *any* theme color changed. e.g. when a new theme got loaded
+---or when theme colors got edited in the theme preferences.
+---@field theme_observable renoise.Document.Observable
 ---
 ---Range: (1 - 4) Get or set globally used clipboard "slots" in the application.
 ---@field active_clipboard_index 1|2|3|4
@@ -73,27 +93,44 @@ function renoise.Application:show_status(message) end
 ---@return string label
 function renoise.Application:show_prompt(title, message, button_labels) end
 
----The modifier keys will be provided as a string.  
+---**Deprecated.** Use `ModifierFlags` instead.
+---
+---The modifier keys will be provided as a string.
 ---Possible keys are dependent on the platform
 --- * Windows : "shift", "alt", "control", "winkey"
 --- * Linux : "shift", "alt", "control", "meta"
---- * Mac : "shift", "option", "control", "command"
----If multiple modifiers are held down, the string will be formatted as  
+--- * Mac : "shift", "option", "control", "command".
+---If multiple modifiers are held down, the string will be formatted as
 ---"<key> + <key>"
 ---Their order will correspond to the following precedence
----`shift + alt/option + control + winkey/meta/command`  
----If no modifier is pressed, this will be an empty string
+---`shift + alt/option + control + winkey/meta/command`
+---If no modifier is pressed, this will be an empty string.
+---@deprecated
 ---@alias ModifierStates string
+
+---The currently pressed/release key's modifiers as platform independent flags.
+---On macOS "control" is their "Command" key and the "meta" keyboard is the "Control" key.
+---On Windows the "meta" key is the "Windows" key and on Linux the "Super" key.
+---@alias ModifierFlags { shift: boolean, control: boolean, alt: boolean, meta: boolean }
 
 ---@class KeyEvent
 ---@field name string name of the key, like 'esc' or 'a'
----@field modifiers ModifierStates the held down modifiers as a string
----@field character string? possible character representation of the key
----@field note integer? virtual keyboard piano key value (starting from 0)
----@field state ("released"|"pressed")? only present if `send_key_release` was set to true
----@field repeated boolean? only present if `send_key_repeat` was set to true
+---**Deprecated.** Use `modifier_flags` instead
+---**READ-ONLY** the held down modifiers as a string
+---@deprecated
+---@field modifiers ModifierStates
+---**READ-ONLY** the held down modifiers as flags
+---@field modifier_flags ModifierFlags
+---possible character representation of the key
+---@field character string?
+---virtual keyboard piano key value (starting from 0)
+---@field note integer?
+---only present if `send_key_release` was set to true
+---@field state ("released"|"pressed")?
+---only present if `send_key_repeat` was set to true
+---@field repeated boolean?
 
----Optional keyhandler to process key events on a custom dialog.  
+---Optional keyhandler to process key events on a custom dialog.
 ---When returning the passed key from the key-handler function, the
 ---key will be passed back to Renoise's key event chain, in order to allow
 ---processing global Renoise key-bindings from your dialog. This will not work
@@ -109,7 +146,15 @@ function renoise.Application:show_prompt(title, message, button_labels) end
 ---@field send_key_repeat boolean? Default: true
 ---@field send_key_release boolean? Default: false
 
----Opens a modal dialog with a title, custom content and custom button labels.  
+---Optional focus change notifier for a custom dialog.
+---Will be called when the dialog gains of loses key focus. You maybe want to initialize
+---your dloag's (modifier) keyboard states here.
+---@alias FocusHandler fun(dialogs: renoise.Dialog, focused: boolean) : KeyEvent?
+---@alias FocusHandlerMemberFunction fun(self: NotifierMemberContext, dialog: renoise.Dialog, focused: boolean): KeyEvent?
+---@alias FocusHandlerMethod1 {[1]:NotifierMemberContext, [2]:FocusHandlerMemberFunction}
+---@alias FocusHandlerMethod2 {[1]:FocusHandlerMemberFunction, [2]:NotifierMemberContext}
+
+---Opens a modal dialog with a title, custom content and custom button labels.
 ---
 ---@see renoise.ViewBuilder for more info about custom views.
 ---@param title string Message box title.
@@ -117,13 +162,13 @@ function renoise.Application:show_prompt(title, message, button_labels) end
 ---@param button_labels string[]
 ---@param key_handler KeyHandler?
 ---@param key_handler_options KeyHandlerOptions?
----@overload fun(title: string, content_view: renoise.Views.View, button_labels: string[], key_handler: KeyHandlerMethod1?, key_handler_options: KeyHandlerOptions?): string
----@overload fun(title: string, content_view: renoise.Views.View, button_labels: string[], key_handler: KeyHandlerMethod2?, key_handler_options: KeyHandlerOptions?): string
+---@param focus_handler FocusHandler?
+---@overload fun(title: string, content_view: renoise.Views.View, button_labels: string[], key_handler: KeyHandlerMethod1?, key_handler_options: KeyHandlerOptions?, focus_handler: FocusHandlerMethod1?): string
+---@overload fun(title: string, content_view: renoise.Views.View, button_labels: string[], key_handler: KeyHandlerMethod2?, key_handler_options: KeyHandlerOptions?, focus_handler: FocusHandlerMethod2?): string
 ---@return string label
-function renoise.Application:show_custom_prompt(title, content_view, button_labels, key_handler, key_handler_options) end
+function renoise.Application:show_custom_prompt(title, content_view, button_labels, key_handler, key_handler_options, focus_handler) end
 
-
----Shows a non modal dialog (a floating tool window) with custom content.  
+---Shows a non modal dialog (a floating tool window) with custom content.
 ---When no key_handler is provided, the Escape key is used to close the dialog.
 ---
 ---@see renoise.ViewBuilder for more info about custom views.
@@ -131,10 +176,50 @@ function renoise.Application:show_custom_prompt(title, content_view, button_labe
 ---@param content_view renoise.Views.View dialog content view.
 ---@param key_handler KeyHandler?
 ---@param key_handler_options KeyHandlerOptions?
----@overload fun(title: string, content_view: renoise.Views.View, key_handler: KeyHandlerMethod1?, key_handler_options: KeyHandlerOptions?): renoise.Dialog
----@overload fun(title: string, content_view: renoise.Views.View, key_handler: KeyHandlerMethod2?, key_handler_options: KeyHandlerOptions?): renoise.Dialog
+---@param focus_handler FocusHandler?
+---@overload fun(title: string, content_view: renoise.Views.View, key_handler: KeyHandlerMethod1?, key_handler_options: KeyHandlerOptions?, focus_handler: FocusHandlerMethod1?): renoise.Dialog
+---@overload fun(title: string, content_view: renoise.Views.View, key_handler: KeyHandlerMethod2?, key_handler_options: KeyHandlerOptions?, focus_handler: FocusHandlerMethod2?): renoise.Dialog
 ---@return renoise.Dialog
-function renoise.Application:show_custom_dialog(title, content_view, key_handler, key_handler_options) end
+function renoise.Application:show_custom_dialog(title, content_view, key_handler, key_handler_options, focus_handler) end
+
+---Defines a custom menu entry, shown in custom dialog windows.
+---
+---Separating entries:
+---To divide entries into groups prepend one or more dashes to the name:
+---```md
+------First Group Item
+---Regular item
+---```
+---
+---To create sub menus, define entries with a common path, using a colon as separator:
+---```md
+---Main Menu Item
+---Sub Menu:Sub Menu Item 1
+---Sub Menu:Sub Menu Item 2
+---```
+---
+---To insert a script menu entry into an existing context menu, see `ToolMenuEntry`.
+---@see ToolMenuEntry
+---
+---@class DialogMenuEntry
+---Name and optional path of the menu entry
+---@field name string
+---A function that is called as soon as the entry is clicked
+---@field invoke fun()
+---Default: true. When false, the action will not be invoked and will be "greyed out".
+---@field active boolean?
+---Default: false. When true, the entry will be marked as "this is a selected option"
+---@field selected boolean?
+
+---Shows a custom context menu on top of the given dialog.
+---
+---When specifying a view, the menu will be shown below the given view instance.
+---The view instance must be part of the dialog that shows the menu and must be visible.
+---By default the menu will be shown at the current mouse cursor position.
+---@param dialog renoise.Dialog
+---@param menu_entries DialogMenuEntry[]
+---@param below_view? renoise.Views.View
+function renoise.Application:show_menu(dialog, menu_entries, below_view) end
 
 ---Opens a modal dialog to query an existing directory from the user.
 ---@param title DialogTitle
@@ -340,6 +425,8 @@ function renoise.Application:save_theme(filename) end
 ---
 --- **READ-ONLY** Check if a dialog is alive and visible.
 ---@field visible boolean
+--- **READ-ONLY** Check if a dialog is visible and is the key window.
+---@field focused boolean
 renoise.Dialog = {}
 
 ---### functions

@@ -36,6 +36,15 @@ renoise.Transport = {
   TIMING_MODEL_LPB = 2
 }
 
+---@enum renoise.Transport.SyncMode
+---@diagnostic disable-next-line: missing-fields
+renoise.Transport = {
+  SYNC_MODE_INTERNAL = 1,
+  SYNC_MODE_MIDI_CLOCK = 2,
+  SYNC_MODE_ABLETON_LINK = 3,
+  SYNC_MODE_JACK = 4
+}
+
 ---### properties
 
 ---@class renoise.Transport
@@ -43,6 +52,12 @@ renoise.Transport = {
 ---Playing
 ---@field playing boolean
 ---@field playing_observable renoise.Document.Observable
+---
+---Transport sync mode.
+---Note: `SYNC_MODE_JACK` only is available on Linux. Trying to enable it on
+---other platforms will fire an error.
+---@field sync_mode renoise.Transport.SyncMode
+---@field sync_mode_observable renoise.Document.Observable
 ---
 ---*READ-ONLY* Old school speed or new LPB timing used?
 ---With `TIMING_MODEL_SPEED`, tpl is used as speed factor. The lpb property
@@ -86,33 +101,41 @@ renoise.Transport = {
 ---@field loop_pattern_observable renoise.Document.Observable
 ---
 ---@field loop_block_enabled boolean Block Loop On/Off
----@field loop_block_start_pos renoise.SongPos Start of block loop
+---@field loop_block_enabled_observable renoise.Document.Observable
 ---@field loop_block_range_coeff integer Range: (2 - 16)
+---@field loop_block_range_coeff_observable renoise.Document.Observable
+---
+---@field loop_block_start_pos renoise.SongPos Start of block loop
 ---
 ---Edit modes
----@field edit_mode boolean
+---@field edit_mode boolean Pattern edit/record mode On/Off
 ---@field edit_mode_observable renoise.Document.Observable
 ---@field edit_step integer Range: (0 - 64)
 ---@field edit_step_observable renoise.Document.Observable
+---
 ---@field octave integer Range: (0 - 8)
 ---@field octave_observable renoise.Document.Observable
+---@field octave_enabled boolean Enabled for MIDI keyboards
+---@field octave_enabled_observable renoise.Document.Observable
 ---
 ---Metronome
----@field metronome_enabled boolean
+---@field metronome_enabled boolean Metronome playback On/Off
 ---@field metronome_enabled_observable renoise.Document.Observable
----@field metronome_beats_per_bar integer Range: (1 - 16)
+---@field metronome_beats_per_bar integer Range: (1 - 16) or 0 = guess from pattern length
 ---@field metronome_beats_per_bar_observable renoise.Document.Observable
 ---@field metronome_lines_per_beat integer Range: (1 - 256) or 0 = songs current LPB
 ---@field metronome_lines_per_beat_observable renoise.Document.Observable
 ---
 ---Metronome precount
----@field metronome_precount_enabled boolean
+---@field metronome_precount_enabled boolean Metronome precount playback On/Off
 ---@field metronome_precount_enabled_observable renoise.Document.Observable
 ---@field metronome_precount_bars integer Range: (1 - 4)
 ---@field metronome_precount_bars_observable renoise.Document.Observable
+---@field metronome_volume number Range: (0 - math.db2lin(6))
+---@field metronome_volume_observable renoise.Document.Observable
 ---
 ---Quantize
----@field record_quantize_enabled boolean
+---@field record_quantize_enabled boolean Record note quantization On/Off
 ---@field record_quantize_enabled_observable renoise.Document.Observable
 ---@field record_quantize_lines integer Range: (1 - 32)
 ---@field record_quantize_lines_observable renoise.Document.Observable
@@ -129,25 +152,33 @@ renoise.Transport = {
 ---@field single_track_edit_mode boolean
 ---@field single_track_edit_mode_observable renoise.Document.Observable
 ---
----Groove. (aka Shuffle)
+---Groove (aka Shuffle)
 ---@field groove_enabled boolean
 ---@field groove_enabled_observable renoise.Document.Observable
 ---@field groove_amounts number[] table with 4 numbers in Range: (0 - 1)
----Attach notifiers that will be called as soon as any groove value changed.
+---Will be called as soon as any groove value changed.
 ---@field groove_assignment_observable renoise.Document.Observable
 ---
 ---Global Track Headroom
 ---To convert to dB: `dB = math.lin2db(renoise.Transport.track_headroom)`
 ---To convert from dB: `renoise.Transport.track_headroom = math.db2lin(dB)`
----@field track_headroom number Range: (math.db2lin(-12) - math.db2lin(0))
+---Range: (math.db2lin(-12) - math.db2lin(0))
+---@field track_headroom number
 ---@field track_headroom_observable renoise.Document.Observable
 ---
 ---Computer Keyboard Velocity.
 ---@field keyboard_velocity_enabled boolean
 ---@field keyboard_velocity_enabled_observable renoise.Document.Observable
 ---Will return the default value of 127 when keyboard_velocity_enabled == false.
----@field keyboard_velocity integer Range: (0 - 127)
+---Range: (0 - 127)
+---@field keyboard_velocity integer
 ---@field keyboard_velocity_observable renoise.Document.Observable
+---
+---*READ-ONLY* true when sample sample dialog is visible and recording started.
+---@field sample_recording boolean
+---Sample recording pattern quantization On/Off.
+---@field sample_recording_sync_enabled boolean
+---@field sample_recording_sync_enabled_observable renoise.Document.Observable
 
 ---### functions
 
@@ -188,8 +219,14 @@ function renoise.Transport:loop_block_move_forwards() end
 ---Move the block loop one segment backwards, when possible.
 function renoise.Transport:loop_block_move_backwards() end
 
----Start a new sample recording when the sample dialog is visible,
----otherwise stop and finish it.
+---Start a new sample recording when the sample dialog is visible.
+function renoise.Transport:start_sample_recording() end
+
+---Stop sample recording when the sample dialog is visible and running
+function renoise.Transport:stop_sample_recording() end
+
+---**Deprecated.** Use `start_sample_recording` or `stop_sample_recording` instead.
+---@deprecated
 function renoise.Transport:start_stop_sample_recording() end
 
 ---Cancel a currently running sample recording when the sample dialog

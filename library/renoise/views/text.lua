@@ -15,12 +15,19 @@ error("Do not try to execute this file. It's just a type definition file.")
 ---| "bold"   # bold font
 ---| "italic" # italic font
 ---| "mono"   # monospace font
+---| "code"   # monospace code font
 
 ---Get/set the color style the text should be displayed with.
 ---@alias TextStyle
 ---| "normal"   # (Default)
 ---| "strong"   # highlighted color
 ---| "disabled" # greyed out color
+---| "custom"   # custom color
+
+---When set, the text will be drawn in the specified color.
+---Set style to something else than "custom" or color to `{0, 0, 0}`
+---to enable the default theme color for the text again.
+---@alias TextColor RGBColor|ThemeColor
 
 ---Setup the text's alignment. Applies only when the view's size is larger than
 ---the needed size to draw the text
@@ -28,6 +35,13 @@ error("Do not try to execute this file. It's just a type definition file.")
 ---| "left"   # (Default)
 ---| "right"  # aligned to the right
 ---| "center" # center text
+
+---Setup the texts's orientation (writing direction).
+---@alias TextOrientation
+---| "horizontal"     # Draw from left to right (Default)
+---| "horizontal-rl"  # Draw from right to left
+---| "vertical"       # Draw from bottom to top
+---| "vertical-tb"    # Draw from top to bottom
 
 ---The text that should be displayed. Setting a new text will resize
 ---the view in order to make the text fully visible (expanding only).
@@ -49,6 +63,8 @@ error("Do not try to execute this file. It's just a type definition file.")
 ---@field text TextSingleLineString
 ---@field font TextFontStyle
 ---@field style TextStyle
+---@field color TextColor
+---@field orientation TextOrientation
 ---@field align TextAlignment
 local Text = {}
 
@@ -58,4 +74,6 @@ local Text = {}
 ---@field text TextSingleLineString?
 ---@field font TextFontStyle?
 ---@field style TextStyle?
+---@field color TextColor?
+---@field orientation TextOrientation?
 ---@field align TextAlignment?

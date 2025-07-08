@@ -21,11 +21,31 @@ error("Do not try to execute this file. It's just a type definition file.")
 ---button's background color of the theme.
 ---@alias ButtonBitmapPath BitmapImagePath
 
+---Setup the buttons text's or bitmap's alignment within the button.
+---@alias ButtonAlignment
+---| "left"   # aligned to the left
+---| "right"  # aligned to the right
+---| "center" # center (default)
+
 ---When set, the unpressed button's background will be drawn in the specified color.
----A text color is automatically selected unless explicitly set, to make sure it's
+---A text color is automatically selected unless explicitly set, to make sure its
 ---always visible.
 ---Set color {0,0,0} to enable the theme colors for the button again.
----@alias ButtonColor RGBColor
+---@alias ButtonColor RGBColor|ThemeColor
+
+---When set, the unpressed button's background text or bitmap will be drawn in the
+---specified color.
+---Set color {0,0,0} to enable the theme colors for the button again.
+---@alias ButtonSecondaryColor RGBColor|ThemeColor
+
+---Get/set the style a button should be displayed with.
+---@alias ButtonStyle
+---| "normal"   # (Default)
+---| "rounded"   # rounded corners on all sides
+---| "rounded_left" # rounded left side
+---| "rounded_right" # rounded right side
+---| "rounded_top" # rounded left side
+---| "rounded_bottom" # rounded right side
 
 --------------------------------------------------------------------------------
 ---## renoise.Views.Button
@@ -40,7 +60,11 @@ error("Do not try to execute this file. It's just a type definition file.")
 ---@class renoise.Views.Button : renoise.Views.Control
 ---@field text ButtonLabel
 ---@field bitmap ButtonBitmapPath
+---@field align ButtonAlignment
+---@field font TextFontStyle
 ---@field color ButtonColor
+---@field secondary_color ButtonSecondaryColor
+---@field style ButtonStyle
 local Button = {}
 
 ---### functions
@@ -75,7 +99,11 @@ function Button:remove_released_notifier(notifier) end
 ---@class ButtonProperties : ControlProperties
 ---@field text ButtonLabel?
 ---@field bitmap ButtonBitmapPath?
+---@field align ButtonAlignment?
+---@field font TextFontStyle?
 ---@field color ButtonColor?
+---@field secondary_color ButtonColor?
+---@field style ButtonStyle?
 ---@field notifier ButtonNotifier?
 ---@field pressed ButtonNotifier?
 ---@field released ButtonNotifier?

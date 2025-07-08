@@ -18,6 +18,11 @@ error("Do not try to execute this file. It's just a type definition file.")
 ---| "justify"    # keep outer views at the borders, distribute the rest
 ---| "distribute" # equally distributes views over the aligners width/height
 
+---The aligner view's initial child views.
+---Views can later on also be added and removed dynamically after construction via 
+---`aligner:add_view(child)` and `aligner:remove_view(child)`
+---@alias AlignerChildViews renoise.Views.View[]
+
 ---------------------------------------------------------------------------------
 ---## renoise.Views.Aligner
 
@@ -32,6 +37,7 @@ error("Do not try to execute this file. It's just a type definition file.")
 ---@field margin RackMargin
 ---@field spacing RackSpacing
 ---@field mode AlignerMode
+---@field background ViewBackgroundStyle
 local Aligner = {}
 
 ---------------------------------------------------------------------------------
@@ -40,3 +46,7 @@ local Aligner = {}
 ---@field margin RackMargin?
 ---@field spacing RackSpacing?
 ---@field mode AlignerMode?
+---@field background ViewBackgroundStyle?
+---@field mouse_handler MouseHandler?
+---@field mouse_events MouseEventTypes?
+---@field views AlignerChildViews?

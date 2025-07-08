@@ -41,12 +41,6 @@ renoise.Track = {
   MUTE_STATE_MUTED = 3
 }
 
----A table of 3 bytes (ranging from 0 to 255)
----representing the red, green and blue channels of a color.
----{0xFF, 0xFF, 0xFF} is white
----{165, 73, 35} is the red from the Renoise logo
----@alias RGBColor {[1] : integer, [2] : integer, [3] : integer}
-
 ---### properties
 
 ---@class renoise.Track
@@ -88,7 +82,7 @@ renoise.Track = {
 ---@field output_routing_observable renoise.Document.Observable
 ---
 ---Delay.
----@field output_delay number Range: (-100.0-100.0) in ms 
+---@field output_delay number Range: (-100.0-100.0) in ms
 ---@field output_delay_observable renoise.Document.Observable
 ---
 ---Pattern editor columns.
@@ -116,6 +110,7 @@ renoise.Track = {
 ---@field available_devices string[] **READ-ONLY** FX devices this track can handle.
 ---**READ-ONLY** Array of tables containing information about the devices.
 ---@field available_device_infos AudioDeviceInfo[]
+---
 ---@field devices renoise.AudioDevice[] **READ-ONLY** List of audio DSP FX.
 ---@field devices_observable renoise.Document.ObservableList
 
@@ -208,5 +203,6 @@ renoise.GroupTrack = {}
 --------------------------------------------------------------------------------
 ---## renoise.TrackDevice
 
----@deprecated - alias for renoise.AudioDevice
+---**Deprecated** Use `renoise.AudioDevice` instead.
+---@deprecated
 ---@alias renoise.TrackDevice renoise.AudioDevice

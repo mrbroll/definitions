@@ -55,15 +55,17 @@ renoise.ViewBuilder.DEFAULT_DIALOG_BUTTON_HEIGHT = 22
 ---* Nested child views: Add child views to the currently specified view.
 ---
 ---### examples:
----Creates a column view with `margin = 1` and adds two text views to the column.
 ---```lua
+----- creates a column view with `margin = 1` and adds two text views to the column.
 ---vb:column {
 ---  margin = 1,
----  vb:text {
----    text = "Text1"
----  },
----  vb:text {
----    text = "Text1"
+---  views = {
+---    vb:text {
+---      text = "Text1"
+---    },
+---    vb:text {
+---      text = "Text1"
+---    }
 ---  }
 ---}
 ---```
@@ -95,11 +97,13 @@ function renoise.ViewBuilder() end
 ---```lua
 ---vb:column {
 ---  margin = 1,
----  vb:text {
----    text = "Text1"
----  },
----  vb:text {
----    text = "Text2"
+---  views = {
+---    vb:text {
+---      text = "Text1"
+---    },
+---    vb:text {
+---      text = "Text2"
+---    }
 ---  }
 ---}
 ---```
@@ -119,11 +123,13 @@ function renoise.ViewBuilder:row(properties) end
 ---```lua
 ---vb:horizontal_aligner {
 ---   mode = "center",
----   vb:text {
----     text = "Text1"
----   },
----   vb:text {
----     text = "Text2"
+---   views = {
+---     vb:text {
+---       text = "Text1"
+---     },
+---     vb:text {
+---       text = "Text2"
+---     }
 ---   }
 ---}
 ---```
@@ -136,21 +142,47 @@ function renoise.ViewBuilder:horizontal_aligner(properties) end
 ---@type AlignerConstructor
 function renoise.ViewBuilder:vertical_aligner(properties) end
 
+---You can add nested child views when constructing stacks by including them
+---in the constructor table. Use the view property `origin` to position them
+---in the stack.
+---
+---```lua
+-----Stack multiple views
+---vb:stack {
+---   views = {
+---     vb:text {
+---       origin = { 10, 10 },
+---       text = "Text1"
+---     },
+---     vb:text {
+---       origin = { 100, 20 },
+---       text = "Text 2"
+---     }
+---   }
+---}
+---```
+---@see renoise.Views.Stack
+---@param properties StackViewProperties?
+---@return renoise.Views.Stack
+function renoise.ViewBuilder:stack(properties) end
+
 ---You can create an empty space in layouts with a space.
 ---
 ---### examples:
 ---```lua
 -----Empty space in layouts
 ---vb:row {
----  vb:button {
----    text = "Some Button"
----  },
----  vb:space { -- extra spacing between buttons
----    width = 8
----  },
----  vb:button {
----    text = "Another Button"
----  },
+---  views = {
+---    vb:button {
+---      text = "Some Button"
+---    },
+---    vb:space { -- extra spacing between buttons
+---      width = 8
+---    },
+---    vb:button {
+---      text = "Another Button"
+---    },
+---  }
 ---}
 ---```
 ---@see renoise.Views.View
@@ -158,6 +190,11 @@ function renoise.ViewBuilder:vertical_aligner(properties) end
 
 ---@type SpaceConstructor
 function renoise.ViewBuilder:space(properties) end
+
+---@see renoise.Views.Canvas
+---@param properties CanvasViewProperties?
+---@return renoise.Views.Canvas
+function renoise.ViewBuilder:canvas(properties) end
 
 ---@see renoise.Views.Text
 ---@param properties TextViewProperties?
@@ -178,6 +215,11 @@ function renoise.ViewBuilder:textfield(properties) end
 ---@param properties MultilineTextFieldProperties?
 ---@return renoise.Views.MultiLineTextField
 function renoise.ViewBuilder:multiline_textfield(properties) end
+
+---@see renoise.Views.TextLink
+---@param properties TextLinkViewProperties?
+---@return renoise.Views.TextLink
+function renoise.ViewBuilder:link(properties) end
 
 ---@see renoise.Views.Bitmap
 ---@param properties BitmapViewProperties?
@@ -223,6 +265,11 @@ function renoise.ViewBuilder:value(properties) end
 ---@param properties ValueFieldProperties?
 ---@return renoise.Views.ValueField
 function renoise.ViewBuilder:valuefield(properties) end
+
+---@see renoise.Views.ScrollBar
+---@param properties ScrollBarProperties?
+---@return renoise.Views.ScrollBar
+function renoise.ViewBuilder:scrollbar(properties) end
 
 ---@see renoise.Views.Slider
 ---@param properties SliderProperties?
