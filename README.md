@@ -1,6 +1,6 @@
 # LuaCATS definitions for the Renoise Lua API 
 
-<img src="https://www.renoise.com/sites/default/files/renoise_logo_0.png" alt="Renoise" height="100"/>
+<img src="https://www.renoise.com/images/renoise_logo.png" alt="Renoise" height="100"/>
 
 This is a [Renoise Tools API](https://github.com/renoise/xrnx) add-on for the [LuaLS Language Server](https://github.com/LuaLS/lua-language-server).
 
