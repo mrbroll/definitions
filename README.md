@@ -1,23 +1,23 @@
-# LuaCATS definitions for the Renoise Lua API 
-
 <img src="https://www.renoise.com/images/renoise_logo.png" alt="Renoise" height="100"/>
+
+## LuaCATS definitions for the Renoise Lua API 
 
 This is a [Renoise Tools API](https://github.com/renoise/xrnx) add-on for the [LuaLS Language Server](https://github.com/LuaLS/lua-language-server).
 
 
 LuaLS provides various features for Lua in code editors, such as autocompletion, type hovers, dynamic type checking, diagnostics and more via [LuaCATS](https://github.com/LuaCATS) annotations.
 
-## HTML API Docs
+### HTML API Docs
 
 A pretty online API reference book based on this definition and general guide to scripting development in Renoise can be read here: [Renoise Scripting Development Book](https://renoise.github.io/xrnx)
 
 The scripting development book, latest API definition and example tools, can be downloaded as a "scripting starter pack" bundle file from the [XRNX Repository](https://github.com/renoise/xrnx/releases).
 
-## Status
+### Status
 
 The API definitions is usable as is is now, but still a work in progress. Please report bugs or improvements as issues here and/or create a merge request.
 
-### Known issues
+#### Known issues
 
 * __eq, __lt, __le meta methods can't be annotated via LuaLS at the moment. 
 They are specified in `### operators` as plain comments and should be converted as soon as LuaLS supports them.
@@ -29,7 +29,7 @@ They are currently mentioned as @operator index, but won't be picked up by the l
 
 * The LuaLS type system allows setting non-existent properties for constructor tables, which then causes runtime crash (for example `vb:text { margin = 100 }`), using [(exact)](https://luals.github.io/wiki/annotations/#class) for `@class` annotations doesn't help.
 
-## Usage
+### Usage
 
 To use the definition in e.g. vscode, first install the **sumneko.lua vscode extension** as described here:
 https://luals.github.io/#vscode-install
@@ -49,7 +49,7 @@ Note: The `Lua.runtime.plugin` setting only is needed in order to automatically 
 See the [XRNX Development](https://renoise.github.io/xrnx/start/development.html) in the Renoise Scripting Book for more detailed information on how to install and use the definitions in vscode and other editors.
 
 
-## Contribute
+### Contribute
 
 Contributions are welcome!
 
