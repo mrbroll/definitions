@@ -302,7 +302,7 @@ function renoise.SampleBuffer:delete_sample_data() end
 ---Read access to samples in a sample data buffer.
 ---@param channel_index integer
 ---@param frame_index integer
----@return number[] values Range: (-1 - 1)
+---@return number values Range: (-1 - 1)
 function renoise.SampleBuffer:sample_data(channel_index, frame_index) end
 
 ---Write access to samples in a sample data buffer. New samples values must be
